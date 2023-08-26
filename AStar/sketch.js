@@ -21,9 +21,9 @@ var closedSet = [];
 
 var start;
 var end;
-
 var w, h;
 var path = [];
+var noSolution = false;
 
 function Spot(i, j) {
 	this.i = i;
@@ -33,9 +33,17 @@ function Spot(i, j) {
 	this.h = 0;
 	this.neighbors = [];
 	this.previous = undefined;
+	this.wall = false;
+
+	if (random(1) < 0.25) {
+		this.wall = true;
+	}
 
 	this.show = function (clr) {
 		fill(clr);
+		if (this.wall) {
+			fill(0);
+		}
 		noStroke();
 		rect(this.i * w, this.j * h, w - 1, h - 1);
 	};
@@ -98,6 +106,8 @@ function setup() {
 	// set up start point and end point
 	start = grid[0][0];
 	end = grid[cols - 1][rows - 1];
+	start.wall = false;
+	end.wall = false;
 
 	openSet.push(start);
 }
@@ -131,7 +141,7 @@ function draw() {
 			var neighbor = neighbors[i];
 
 			// Check if the neighbor had already checked .
-			if (!closedSet.includes(neighbor)) {
+			if (!closedSet.includes(neighbor) && !neighbor.wall) {
 				// each spot has a distance of one
 				// This is the 'new' g value of a neighbor
 				var tempG = current.g + 1;
@@ -157,6 +167,9 @@ function draw() {
 		// we can keep going
 	} else {
 		// no solution
+		console.log('no solution');
+		noSolution = true;
+		noLoop(); // Stop the p5 looping
 	}
 
 	background(0);
@@ -176,13 +189,15 @@ function draw() {
 	}
 
 	// Find the path
-	path = [];
+	if (!noSolution) {
+		path = [];
 
-	var temp = current;
-	path.push(temp);
-	while (temp.previous !== undefined) {
-		path.push(temp.previous);
-		temp = temp.previous;
+		var temp = current;
+		path.push(temp);
+		while (temp.previous !== undefined) {
+			path.push(temp.previous);
+			temp = temp.previous;
+		}
 	}
 
 	for (var i = 0; i < path.length; i++) {
