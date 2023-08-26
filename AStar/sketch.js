@@ -7,13 +7,12 @@ function removeFromArray(arr, elt) {
 }
 
 function heuristic(curr, end) {
-	// var d = dist(curr.i, curr.j, end.i, end.j);
-
-	var d = abs(curr.i - end.i) + abs(curr.j - end.j);
+	var d = dist(curr.i, curr.j, end.i, end.j);
+	// var d = abs(curr.i - end.i) + abs(curr.j - end.j);
 	return d;
 }
-var cols = 25;
-var rows = 25;
+var cols = 50;
+var rows = 50;
 var grid = new Array(cols);
 
 var openSet = [];
@@ -35,7 +34,7 @@ function Spot(i, j) {
 	this.previous = undefined;
 	this.wall = false;
 
-	if (random(1) < 0.25) {
+	if (random(1) < 0.3) {
 		this.wall = true;
 	}
 
@@ -73,6 +72,22 @@ function Spot(i, j) {
 
 		if (this.j > 0) {
 			this.neighbors.push(grid[this.i][this.j - 1]);
+		}
+
+		if (i > 0 && j > 0) {
+			this.neighbors.push(grid[this.i - 1][this.j - 1]);
+		}
+
+		if (i < cols - 1 && j > 0) {
+			this.neighbors.push(grid[this.i + 1][this.j - 1]);
+		}
+
+		if (i < cols - 1 && j < rows - 1) {
+			this.neighbors.push(grid[this.i + 1][this.j + 1]);
+		}
+
+		if (i > 0 && j < rows - 1) {
+			this.neighbors.push(grid[this.i - 1][this.j + 1]);
 		}
 	};
 }
@@ -146,30 +161,34 @@ function draw() {
 				// This is the 'new' g value of a neighbor
 				var tempG = current.g + 1;
 
+				var newPath = false;
 				// If this neighbor is already in open set.
 				if (openSet.includes(neighbor)) {
 					// And if it has bigger g. Refresh with new g.
 					if (neighbor.g > tempG) {
 						neighbor.g = tempG;
+						newPath = true;
 					}
 				} else {
 					// Set the g on neighbor.
 					neighbor.g = tempG;
 					openSet.push(neighbor);
+					newPath = true;
 				}
 
-				neighbor.h = heuristic(neighbor, end);
-				neighbor.f = neighbor.g + neighbor.h;
-
-				neighbor.previous = current;
+				if (newPath) {
+					neighbor.h = heuristic(neighbor, end);
+					neighbor.f = neighbor.g + neighbor.h;
+					neighbor.previous = current;
+				}
 			}
 		}
 		// we can keep going
 	} else {
 		// no solution
 		console.log('no solution');
-		noSolution = true;
 		noLoop(); // Stop the p5 looping
+		return;
 	}
 
 	background(0);
@@ -189,15 +208,13 @@ function draw() {
 	}
 
 	// Find the path
-	if (!noSolution) {
-		path = [];
+	path = [];
 
-		var temp = current;
-		path.push(temp);
-		while (temp.previous !== undefined) {
-			path.push(temp.previous);
-			temp = temp.previous;
-		}
+	var temp = current;
+	path.push(temp);
+	while (temp.previous !== undefined) {
+		path.push(temp.previous);
+		temp = temp.previous;
 	}
 
 	for (var i = 0; i < path.length; i++) {
