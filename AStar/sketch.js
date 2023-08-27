@@ -39,12 +39,9 @@ function Spot(i, j) {
 	}
 
 	this.show = function (clr) {
-		// fill(clr);
-		if (this.wall) {
-			fill(0);
-			noStroke();
-			ellipse(this.i * w + w / 2, this.j * h + h / 2, w / 2, h / 2);
-		}
+		fill(clr);
+		noStroke();
+		ellipse(this.i * w + w / 2, this.j * h + h / 2, w / 2, h / 2);
 	};
 
 	/*
@@ -191,20 +188,24 @@ function draw() {
 		return;
 	}
 
-	background(255);
+	background(75, 0, 100);
 
 	for (var i = 0; i < cols; i++) {
 		for (var j = 0; j < rows; j++) {
-			grid[i][j].show(color(255));
+			if (!grid[i][j].wall) {
+				grid[i][j].show(color(75, 0, 100));
+			} else {
+				grid[i][j].show(color(0));
+			}
 		}
 	}
 
 	for (var i = 0; i < closedSet.length; i++) {
-		// closedSet[i].show(color(255, 0, 0));
+		closedSet[i].show(color(220, 20, 60));
 	}
 
 	for (var i = 0; i < openSet.length; i++) {
-		// openSet[i].show(color(0, 255, 0));
+		openSet[i].show(color(30, 144, 255));
 	}
 
 	// Find the path
@@ -218,7 +219,7 @@ function draw() {
 	}
 
 	noFill();
-	stroke(255, 0, 200);
+	stroke(255, 255, 0);
 	strokeWeight(w / 2);
 	beginShape();
 	for (var i = 0; i < path.length; i++) {
