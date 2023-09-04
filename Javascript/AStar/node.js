@@ -1,4 +1,4 @@
-function Spot(i, j) {
+function Node(i, j) {
 	this.i = i;
 	this.j = j;
 	this.f = 0;
@@ -8,7 +8,7 @@ function Spot(i, j) {
 	this.previous = undefined;
 	this.wall = false;
 
-	if (random(1) < 0.3) {
+	if (random(1) < 0.4) {
 		this.wall = true;
 	}
 
@@ -16,6 +16,12 @@ function Spot(i, j) {
 		fill(clr);
 		noStroke();
 		ellipse(this.i * w + w / 2, this.j * h + h / 2, w / 2, h / 2);
+	};
+
+	this.heuristic = function (node) {
+		var d = dist(this.i, this.j, node.i, node.j);
+		// var d = abs(this.i - this.i) + abs(node.j - node.j);
+		this.h = d;
 	};
 
 	/*

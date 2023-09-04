@@ -6,14 +6,14 @@ function removeFromArray(arr, elt) {
 	}
 }
 
-function heuristic(curr, end) {
-	var d = dist(curr.i, curr.j, end.i, end.j);
-	// var d = abs(curr.i - end.i) + abs(curr.j - end.j);
-	return d;
+function drawNodes(list, clr) {
+	for (var i = 0; i < list.length; i++) {
+		list[i].show(clr);
+	}
 }
 
-var cols = 100;
-var rows = 100;
+var cols = 50;
+var rows = 50;
 var grid = new Array(cols);
 
 var openSet = [];
@@ -36,14 +36,14 @@ function setup() {
 		grid[i] = new Array(rows);
 	}
 
-	// Create all Spots
+	// Create all Nodes
 	for (var i = 0; i < cols; i++) {
 		for (var j = 0; j < rows; j++) {
-			grid[i][j] = new Spot(i, j);
+			grid[i][j] = new Node(i, j);
 		}
 	}
 
-	//Add all neighbors for each spot
+	//Add all neighbors for each Node
 	for (var i = 0; i < cols; i++) {
 		for (var j = 0; j < rows; j++) {
 			grid[i][j].addNeighbors(grid);
@@ -61,14 +61,13 @@ function setup() {
 
 function draw() {
 	if (openSet.length > 0) {
-		// Find the Spot with the lowest cost. This Spot is the current Spot.
+		// Find the Node with the lowest cost. This Spot is the current Spot.
 		var winner = 0;
 		for (var i = 0; i < openSet.length; i++) {
 			if (openSet[i].f < openSet[winner].f) {
 				winner = i;
 			}
 		}
-		console.log(winner);
 
 		var current = openSet[winner];
 
@@ -110,7 +109,7 @@ function draw() {
 				}
 
 				if (newPath) {
-					neighbor.h = heuristic(neighbor, end);
+					neighbor.heuristic(end);
 					neighbor.f = neighbor.g + neighbor.h;
 					neighbor.previous = current;
 				}
@@ -124,6 +123,7 @@ function draw() {
 		return;
 	}
 
+	// Drawing
 	background(75, 0, 100);
 
 	for (var i = 0; i < cols; i++) {
@@ -136,13 +136,8 @@ function draw() {
 		}
 	}
 
-	for (var i = 0; i < closedSet.length; i++) {
-		closedSet[i].show(color(220, 20, 60));
-	}
-
-	for (var i = 0; i < openSet.length; i++) {
-		openSet[i].show(color(30, 144, 255));
-	}
+	drawNodes(closedSet, color(220, 20, 60));
+	drawNodes(openSet, color(30, 144, 255));
 
 	// Find the path
 	path = [];
